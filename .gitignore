@@ -47,7 +47,7 @@ app.*.map.json
 
 # firebase key
 google-services.json
-
+firebase_options.dart
 # NOT RELATED
 web/
 windows/
