@@ -6,7 +6,6 @@ import 'convert_currencies.dart';
 import 'package:get/get.dart';
 
 FirebaseFirestore firestore = FirebaseFirestore.instance;
-CollectionReference users = FirebaseFirestore.instance.collection('users');
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,25 +31,28 @@ class _MyHomePageState extends State<MyHomePage> {
   var currencyCode = "".obs;
   var isShow = false.obs;
 
-  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       home: Scaffold(
+        //TODO Change to FutureBuilder since its a one time read 
         body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
           // inside the <> you enter the type of your stream
           stream: FirebaseFirestore.instance
-              .collection('exchange-daily')
-              .doc('2022-07-07')
-              .collection('prices')
+              .collection('today_price')
               .snapshots()
               .map((snapshot) => snapshot),
 
           builder: (context, snapshot) {
             if (snapshot.hasData) {
+              var lol = snapshot.data!.docs;
+              int count = snapshot.data!.docs[0].data().length.obs();
+              var rr = snapshot.data!.docs.first.data();
+
               return Stack(children: [
                 ListView.builder(
-                  itemCount: snapshot.data!.docs[0].data().length.obs(),
+                  itemCount: count,
                   itemBuilder: (context, index) {
                     // get the code for each counrty to set the image icon
                     var icon1 = "".obs;
@@ -86,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             buy_price = buyPrices1;
                             sellPrice = sellPrices1;
                             currencyCode = currenecyCode1;
-
+                            print(rr);
                             isShow.value = true;
                           }),
                     );
@@ -100,18 +102,20 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: Card(
                         elevation: 100,
                         child: Container(
-                          height: 300,
+                          height: 350,
                           width: 300,
                           color: Color.fromARGB(83, 255, 7, 7),
                           child: Column(
                             children: [
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  ElevatedButton(
+                                  IconButton(
                                       onPressed: () {
                                         isShow.value = false;
                                       },
-                                      child: Text('data'))
+                                      icon:
+                                          Icon(Icons.one_x_mobiledata_rounded))
                                 ],
                               ),
                               Convert(
