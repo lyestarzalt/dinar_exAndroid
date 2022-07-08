@@ -101,11 +101,25 @@ class _MyHomePageState extends State<MyHomePage> {
                         elevation: 100,
                         child: Container(
                           height: 300,
+                          width: 300,
                           color: Color.fromARGB(83, 255, 7, 7),
-                          child: Convert(
-                            buyPrice: buy_price.value,
-                            sellPrice: sellPrice.value,
-                            currency: currencyCode.value,
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        isShow.value = false;
+                                      },
+                                      child: Text('data'))
+                                ],
+                              ),
+                              Convert(
+                                buyPrice: buy_price.value,
+                                sellPrice: sellPrice.value,
+                                currency: currencyCode.value,
+                              ),
+                            ],
                           ),
                         ),
                       ),
