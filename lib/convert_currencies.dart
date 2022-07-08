@@ -94,7 +94,7 @@ class _ConvertState extends State<Convert> {
                             ? controller.controllerText.value
                             : "0") *
                         widget.buyPrice)
-                    .toString(),
+                    .toStringAsFixed(2),
               ),
             ),
           ),

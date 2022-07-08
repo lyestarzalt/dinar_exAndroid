@@ -31,23 +31,30 @@ class _MyHomePageState extends State<MyHomePage> {
   var currencyCode = "".obs;
   var isShow = false.obs;
 
-  
+  CollectionReference users = FirebaseFirestore.instance.collection('users');
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       home: Scaffold(
-        //TODO Change to FutureBuilder since its a one time read 
-        body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        //TODO Change to FutureBuilder since its a one time read
+        body: FutureBuilder<QuerySnapshot>(
           // inside the <> you enter the type of your stream
-          stream: FirebaseFirestore.instance
-              .collection('today_price')
-              .snapshots()
-              .map((snapshot) => snapshot),
 
-          builder: (context, snapshot) {
+          future: FirebaseFirestore.instance.collection('exchange-daily').get(),
+
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasData) {
-              var lol = snapshot.data!.docs;
-              int count = snapshot.data!.docs[0].data().length.obs();
+              Map<String, dynamic> dataa =
+                  snapshot.data!.docs.last.data() as Map<String, dynamic>;
+
+              Map<String, dynamic> buy_prices = dataa['anis'][0];
+              Map<String, dynamic> sell_prices = dataa['anis'][1];
+
+              //var reversed = list.keys.toList();
+              //print(reversed);
+              int count = buy_prices.length;
               var rr = snapshot.data!.docs.first.data();
 
               return Stack(children: [
@@ -60,17 +67,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     var buyPrices1 = 0.0.obs;
                     var sellPrices1 = 0.0.obs;
 
-                    icon1.value =
-                        snapshot.data!.docs[0].data().keys.toList()[index];
+                    icon1.value = buy_prices.keys.toList()[index];
+                    /* snapshot.data!.docs[0].data().keys.toList()[index]; */
 
-                    currenecyCode1.value =
-                        snapshot.data!.docs[0].data().keys.toList()[index];
+                    currenecyCode1.value = buy_prices.keys.toList()[index];
+                    /*  snapshot.data!.docs[0].data().keys.toList()[index]; */
 
-                    buyPrices1.value =
-                        snapshot.data!.docs[0].data().values.toList()[index];
+                    buyPrices1.value = buy_prices.values.toList()[index].toDouble();
+                    /*  snapshot.data!.docs[0].data().values.toList()[index]; */
 
-                    sellPrices1.value =
-                        snapshot.data!.docs[1].data().values.toList()[index];
+                    sellPrices1.value = sell_prices.values.toList()[index].toDouble();
+                    /*   snapshot.data!.docs[1].data().values.toList()[index]; */
 
                     //our main list
                     return Card(
