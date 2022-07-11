@@ -6,7 +6,7 @@ import 'convert_currencies.dart';
 import 'package:get/get.dart';
 
 class CurrenciesList extends StatefulWidget {
- const CurrenciesList({Key? key}) : super(key: key);
+  const CurrenciesList({Key? key}) : super(key: key);
 
   @override
   State<CurrenciesList> createState() => _CurrenciesListState();
@@ -24,115 +24,118 @@ class _CurrenciesListState extends State<CurrenciesList> {
   Widget build(BuildContext context) {
     return Container(
       child: FutureBuilder<QuerySnapshot>(
-          // inside the <> you enter the type of your stream
+        // inside the <> you enter the type of your stream
 
-          future: FirebaseFirestore.instance.collection('exchange-daily').get(),
+        future: FirebaseFirestore.instance.collection('exchange-daily').get(),
 
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (snapshot.hasData) {
-              Map<String, dynamic> dataa =
-                  snapshot.data!.docs.last.data() as Map<String, dynamic>;
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasData) {
+            Map<String, dynamic> yesterayPrice =
+                snapshot.data!.docs[snapshot.data!.docs.length - 2].data()
+                    as Map<String, dynamic>;
 
-              Map<String, dynamic> buy_prices = dataa['anis'][0];
-              Map<String, dynamic> sell_prices = dataa['anis'][1];
+            Map<String, dynamic> todayPrices =
+                snapshot.data!.docs.last.data() as Map<String, dynamic>;
+            Map<String, dynamic> yesterayPriceBuyMap = yesterayPrice['anis'][0];
 
-              //var reversed = list.keys.toList();
-              //print(reversed);
-              int count = buy_prices.length;
-              var rr = snapshot.data!.docs.first.data();
+            Map<String, dynamic> todayBuyPricesMap = todayPrices['anis'][0];
+            Map<String, dynamic> todaySellPricesMap = todayPrices['anis'][1];
 
-              return Stack(children: [
-                ListView.builder(
-                  itemCount: count,
-                  itemBuilder: (context, index) {
-                    // get the code for each counrty to set the image icon
-                    var icon1 = "".obs;
-                    var currenecyCode1 = "".obs;
-                    var buyPrices1 = 0.0.obs;
-                    var sellPrices1 = 0.0.obs;
+            int itemCount = todayBuyPricesMap.length;
 
-                    icon1.value = buy_prices.keys.toList()[index];
-                    /* snapshot.data!.docs[0].data().keys.toList()[index]; */
+            return Stack(children: [
+              ListView.builder(
+                itemCount: itemCount,
+                itemBuilder: (context, index) {
+                  // get the code for each counrty to set the image icon
+                  var iconItem = "".obs;
+                  var currencyCodeItem = "".obs;
+                  var yesterdayBuyPriceItem = 0.0.obs;
+                  var buyPriceItem = 0.0.obs;
+                  var sellPriceItem = 0.0.obs;
 
-                    currenecyCode1.value = buy_prices.keys.toList()[index];
-                    /*  snapshot.data!.docs[0].data().keys.toList()[index]; */
+                  iconItem.value = todayBuyPricesMap.keys.toList()[index];
 
-                    buyPrices1.value =
-                        buy_prices.values.toList()[index].toDouble();
-                    /*  snapshot.data!.docs[0].data().values.toList()[index]; */
+                  currencyCodeItem.value =
+                      todayBuyPricesMap.keys.toList()[index];
+                  yesterdayBuyPriceItem.value =
+                      yesterayPriceBuyMap.values.toList()[index].toDouble();
 
-                    sellPrices1.value =
-                        sell_prices.values.toList()[index].toDouble();
-                    /*   snapshot.data!.docs[1].data().values.toList()[index]; */
+                  buyPriceItem.value =
+                      todayBuyPricesMap.values.toList()[index].toDouble();
 
-                    //our main list
-                    return Card(
-                      elevation: 50,
-                      child: ListTile(
-                          leading: Image.asset(
-                            'icons/currency/${icon1.value}.png',
-                            package: 'currency_icons',
-                          ),
-                          title: Text(
-                            currenecyCode1.toString(),
-                          ),
-                          trailing: Text(buyPrices1.value.toString()),
-                          onTap: () {
-                            buy_price = buyPrices1;
-                            sellPrice = sellPrices1;
-                            currencyCode = currenecyCode1;
-                            print(rr);
-                            isShow.value = true;
-                          }),
-                    );
-                  },
-                ),
-                Obx(
-                  () => Visibility(
-                    visible: isShow.value,
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Card(
-                        elevation: 100,
-                        child: Container(
-                          height: 350,
-                          width: 300,
-                          color: Color.fromARGB(83, 255, 7, 7),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  IconButton(
-                                      onPressed: () {
-                                        isShow.value = false;
-                                      },
-                                      icon:
-                                          Icon(Icons.one_x_mobiledata_rounded))
-                                ],
-                              ),
-                              Convert(
-                                buyPrice: buy_price.value,
-                                sellPrice: sellPrice.value,
-                                currency: currencyCode.value,
-                              ),
-                            ],
-                          ),
+                  sellPriceItem.value =
+                      todaySellPricesMap.values.toList()[index].toDouble();
+
+                  //our main list
+                  //Using a list of rows instead of Listile becuase we can have much more customizability
+                  return GestureDetector(
+                    onTap: () {
+                      buy_price = buyPriceItem;
+                      sellPrice = sellPriceItem;
+                      currencyCode = currencyCodeItem;
+                      isShow.value = true;
+                    },
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'icons/currency/${iconItem.value}.png',
+                          package: 'currency_icons',
+                        ),
+                        Text(
+                          currencyCodeItem.toString(),
+                        ),
+                        Text(buyPriceItem.value.toString()),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              Obx(
+                () => Visibility(
+                  visible: isShow.value,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Card(
+                      elevation: 100,
+                      child: Container(
+                        height: 350,
+                        width: 300,
+                        color: const Color.fromARGB(83, 255, 7, 7),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      isShow.value = false;
+                                    },
+                                    icon: const Icon(
+                                        Icons.one_x_mobiledata_rounded))
+                              ],
+                            ),
+                            Convert(
+                              buyPrice: buy_price.value,
+                              sellPrice: sellPrice.value,
+                              currency: currencyCode.value,
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                )
-              ]);
-            }
-            if (snapshot.hasError) {
-              return const Text('Error');
-            } else {
-              return const CircularProgressIndicator();
-            }
-          },
-        ),
+                ),
+              )
+            ]);
+          }
+          if (snapshot.hasError) {
+            return const Text('Error');
+          } else {
+            return const CircularProgressIndicator();
+          }
+        },
+      ),
     );
   }
 }

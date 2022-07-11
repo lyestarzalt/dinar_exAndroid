@@ -14,7 +14,7 @@ void main() async {
   );
 
   runApp(
-    MyHomePage(),
+   const MyHomePage(),
   );
 }
 
@@ -31,7 +31,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onItemTapped(index) {
     selectedIndex.value = index;
-    print(selectedIndex);
   }
 
   static const List<Widget> _widgetOptions = <Widget>[
