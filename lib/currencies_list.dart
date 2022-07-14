@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'convert_currencies.dart';
 import 'package:get/get.dart';
@@ -36,10 +35,10 @@ class _CurrenciesListState extends State<CurrenciesList> {
 
             Map<String, dynamic> todayPrices =
                 snapshot.data!.docs.last.data() as Map<String, dynamic>;
-            Map<String, dynamic> yesterayPriceBuyMap = yesterayPrice['anis'][0];
+            Map<String, dynamic> yesterayPriceBuyMap = yesterayPrice['anis'][1];
 
-            Map<String, dynamic> todayBuyPricesMap = todayPrices['anis'][0];
-            Map<String, dynamic> todaySellPricesMap = todayPrices['anis'][1];
+            Map<String, dynamic> todayBuyPricesMap = todayPrices['anis'][1];
+            Map<String, dynamic> todaySellPricesMap = todayPrices['anis'][0];
 
             int itemCount = todayBuyPricesMap.length;
 
@@ -53,11 +52,12 @@ class _CurrenciesListState extends State<CurrenciesList> {
                   var yesterdayBuyPriceItem = 0.0.obs;
                   var buyPriceItem = 0.0.obs;
                   var sellPriceItem = 0.0.obs;
-
+                  var percent = 0.0.obs;
                   iconItem.value = todayBuyPricesMap.keys.toList()[index];
 
                   currencyCodeItem.value =
                       todayBuyPricesMap.keys.toList()[index];
+
                   yesterdayBuyPriceItem.value =
                       yesterayPriceBuyMap.values.toList()[index].toDouble();
 
@@ -66,27 +66,58 @@ class _CurrenciesListState extends State<CurrenciesList> {
 
                   sellPriceItem.value =
                       todaySellPricesMap.values.toList()[index].toDouble();
-
+                  percent.value = ((1 -
+                          (yesterdayBuyPriceItem.value / buyPriceItem.value)) *
+                      100);
                   //our main list
                   //Using a list of rows instead of Listile becuase we can have much more customizability
-                  return GestureDetector(
-                    onTap: () {
-                      buy_price = buyPriceItem;
-                      sellPrice = sellPriceItem;
-                      currencyCode = currencyCodeItem;
-                      isShow.value = true;
-                    },
-                    child: Row(
-                      children: [
-                        Image.asset(
-                          'icons/currency/${iconItem.value}.png',
-                          package: 'currency_icons',
+                  return Container(
+                    height: 70,
+                    child: Card(
+                      child: GestureDetector(
+                        onTap: () {
+                          buy_price = buyPriceItem;
+                          sellPrice = sellPriceItem;
+                          currencyCode = currencyCodeItem;
+                          isShow.value = true;
+                        },
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(5, 0, 0, 000),
+                              child: Image.asset(
+                                'icons/currency/${iconItem.value}.png',
+                                package: 'currency_icons',
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                currencyCodeItem.toString(),
+                              ),
+                            ),
+                            const Spacer(),
+                            Column(
+                              children: [
+                                Icon(percent.value > 0.0
+                                    ? Icons.trending_up
+                                    : percent.value == 0.0
+                                        ? Icons.trending_flat
+                                        : Icons.trending_down),
+                                Text(
+                                  percent.value.toStringAsFixed(1) + '%',
+                                  style: TextStyle(
+                                      color: percent.value >= 0.0
+                                          ? Colors.green
+                                          : Colors.red),
+                                ),
+                              ],
+                            ),
+                            Spacer(),
+                            Text(buyPriceItem.value.toStringAsFixed(1)),
+                          ],
                         ),
-                        Text(
-                          currencyCodeItem.toString(),
-                        ),
-                        Text(buyPriceItem.value.toString()),
-                      ],
+                      ),
                     ),
                   );
                 },
@@ -132,7 +163,7 @@ class _CurrenciesListState extends State<CurrenciesList> {
           if (snapshot.hasError) {
             return const Text('Error');
           } else {
-            return const CircularProgressIndicator();
+            return Center(child: const CircularProgressIndicator());
           }
         },
       ),

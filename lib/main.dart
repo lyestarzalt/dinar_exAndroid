@@ -4,6 +4,7 @@ import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'currencies_list.dart';
 import 'package:get/get.dart';
+import 'trends.dart';
 
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -14,7 +15,7 @@ void main() async {
   );
 
   runApp(
-   const MyHomePage(),
+    const MyHomePage(),
   );
 }
 
@@ -26,7 +27,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
- 
   var selectedIndex = 0.obs;
 
   void _onItemTapped(index) {
@@ -35,34 +35,36 @@ class _MyHomePageState extends State<MyHomePage> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     CurrenciesList(),
-    Text(
-      'Index 2: School',
-    ),
+    Chart()
   ];
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       home: Scaffold(
-          bottomNavigationBar: Obx(() => BottomNavigationBar(
-                items: const <BottomNavigationBarItem>[
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.attach_money_sharp),
-                    label: 'List',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.trending_up_rounded),
-                    label: 'chart',
-                  ),
-                ],
-                currentIndex: selectedIndex.value,
-                selectedItemColor: Colors.amber[800],
-                onTap: (_onItemTapped),
-              )),
-          body: Obx(
-            () => _widgetOptions.elementAt(selectedIndex.value),
-            // This trailing comma makes auto-formatting nicer for build methods.
-          )),
+        appBar: AppBar(
+          title: const Text('dinar exchange debug'),
+        ),
+        bottomNavigationBar: Obx(() => BottomNavigationBar(
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.attach_money_sharp),
+                  label: 'List',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.trending_up_rounded),
+                  label: 'chart',
+                ),
+              ],
+              currentIndex: selectedIndex.value,
+              selectedItemColor: Colors.amber[800],
+              onTap: (_onItemTapped),
+            )),
+        body: Obx(
+          () => _widgetOptions.elementAt(selectedIndex.value),
+          // This trailing comma makes auto-formatting nicer for build methods.
+        ),
+      ),
     );
   }
 }
