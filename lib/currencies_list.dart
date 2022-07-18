@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'convert_currencies.dart';
+import 'util.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class CurrenciesList extends StatefulWidget {
   const CurrenciesList({Key? key}) : super(key: key);
@@ -17,6 +19,17 @@ class _CurrenciesListState extends State<CurrenciesList> {
   var currencyCode = "".obs;
   var isShow = false.obs;
   var selectedIndex = 0.obs;
+
+  NumberFormat currency(code) {
+    Locale locale = Localizations.localeOf(context);
+    locale.countryCode;
+    var format =
+        NumberFormat.simpleCurrency(name: code.toString().toUpperCase());
+    print("CURRENCY SYMBOL ${format.currencySymbol}"); // $
+    print(
+        "CURRENCY NAME ${codeToCountry[code.toString().toUpperCase()]}"); // USD
+    return format;
+  }
 
   //
   @override
@@ -41,7 +54,10 @@ class _CurrenciesListState extends State<CurrenciesList> {
             Map<String, dynamic> todaySellPricesMap = todayPrices['anis'][0];
 
             int itemCount = todayBuyPricesMap.length;
-
+/*             for (var anis in todayBuyPricesMap.keys) {
+              currency(anis);
+            } */
+            var format = NumberFormat.currency(name: 'DZD');
             return Stack(children: [
               ListView.builder(
                 itemCount: itemCount,
@@ -49,15 +65,19 @@ class _CurrenciesListState extends State<CurrenciesList> {
                   // get the code for each counrty to set the image icon
                   var iconItem = "".obs;
                   var currencyCodeItem = "".obs;
+                  var countryName = "".obs;
                   var yesterdayBuyPriceItem = 0.0.obs;
                   var buyPriceItem = 0.0.obs;
                   var sellPriceItem = 0.0.obs;
                   var percent = 0.0.obs;
                   iconItem.value = todayBuyPricesMap.keys.toList()[index];
-
+                  //
+                  countryName.value = codeToCountry[
+                      todayBuyPricesMap.keys.toList()[index].toUpperCase()];
+                  //
                   currencyCodeItem.value =
-                      todayBuyPricesMap.keys.toList()[index];
-
+                      todayBuyPricesMap.keys.toList()[index].toUpperCase();
+//
                   yesterdayBuyPriceItem.value =
                       yesterayPriceBuyMap.values.toList()[index].toDouble();
 
@@ -93,7 +113,7 @@ class _CurrenciesListState extends State<CurrenciesList> {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                currencyCodeItem.toString(),
+                                currencyCodeItem.value,
                               ),
                             ),
                             const Spacer(),
@@ -113,8 +133,13 @@ class _CurrenciesListState extends State<CurrenciesList> {
                                 ),
                               ],
                             ),
-                            Spacer(),
-                            Text(buyPriceItem.value.toStringAsFixed(1)),
+                            const Spacer(),
+                            Container(
+                              width: 30,
+                              child:
+                                  Text(buyPriceItem.value.toStringAsFixed(0)),
+                            ),
+                            Text('DZD')
                           ],
                         ),
                       ),
@@ -163,7 +188,7 @@ class _CurrenciesListState extends State<CurrenciesList> {
           if (snapshot.hasError) {
             return const Text('Error');
           } else {
-            return Center(child: const CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
         },
       ),

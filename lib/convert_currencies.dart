@@ -14,7 +14,7 @@ class Controller extends GetxController {
 
     debounce(controllerText, (_) {
       print("debouce$_");
-    }, time: Duration(seconds: 1));
+    }, time: Duration(microseconds: 10));
     super.onInit();
   }
 }
@@ -37,13 +37,35 @@ class Convert extends StatefulWidget {
 
 class _ConvertState extends State<Convert> {
   var controller = Get.put(Controller());
+  var todinar = true.obs;
+
+  String value(istrue, sell, buy) {
+    if (istrue) {
+      return (double.parse(controller.controllerText.value.isNotEmpty
+                  ? controller.controllerText.value
+                  : "0") *
+              buy)
+          .toStringAsFixed(2);
+    } else {
+      return (double.parse(controller.controllerText.value.isNotEmpty
+                  ? controller.controllerText.value
+                  : "0") /
+              sell)
+          .toStringAsFixed(2);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
         Row(
           children: [
-            Text("Convert"),
+            Obx(
+              () => Text(todinar.value == true
+                  ? "Convert from ${widget.currency} to Dinar"
+                  : 'Convert from Dinar to ${widget.currency}'),
+            )
           ],
         ),
         Card(
@@ -71,7 +93,13 @@ class _ConvertState extends State<Convert> {
             ),
             GestureDetector(
                 onTap: () {
-                  print('Button tapped');
+                  //from stackoverlow
+                  //That is value xor-equals true, which will flip it every time,
+                  //and without any branching or temporary variables.
+                  todinar.value ^= true;
+
+                  //or this
+                  //todinar.value = !todinar.value;
                 },
                 child: const CircleAvatar(
                     radius: 15,
@@ -79,23 +107,18 @@ class _ConvertState extends State<Convert> {
                     child: Icon(Icons.compare_arrows_outlined))),
           ],
         ),
-        Obx(
-          () => Card(
-            color: Colors.white,
-            elevation: 50,
-            child: Container(
-              height: 120,
-              width: 400,
-              //check if the value of the input text is not an empty string
-              //to avoid invalid double when the user removes values
+        Card(
+          color: Colors.white,
+          elevation: 50,
+          child: Container(
+            height: 120,
+            width: 400,
+            //check if the value of the input text is not an empty string
+            //to avoid invalid double when the user removes values
 
-              child: Text(
-                (double.parse(controller.controllerText.value.isNotEmpty
-                            ? controller.controllerText.value
-                            : "0") *
-                        widget.buyPrice)
-                    .toStringAsFixed(2),
-              ),
+            child: Obx(
+              () =>
+                  Text(value(todinar.value, widget.sellPrice, widget.buyPrice)),
             ),
           ),
         )

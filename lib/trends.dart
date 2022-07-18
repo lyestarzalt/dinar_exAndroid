@@ -35,11 +35,11 @@ class _ChartState extends State<Chart> {
             var value = snapshot.data!.docs;
             for (var anis in value) {
               Map<String, dynamic> lol = anis.data() as Map<String, dynamic>;
-              logger.i(lol['anis'][0]['chf']);
+              logger.i(lol['anis'][1]['cad']);
               String date = anis.id;
               var parsedDate = DateTime.parse(date);
               data.add(_SalesData(
-                  parsedDate.day.toString(), lol['anis'][0]['chf'].toDouble()));
+                  parsedDate.day.toString(), lol['anis'][0]['cad'].toDouble()));
               logger.wtf(parsedDate);
             }
 
@@ -63,7 +63,7 @@ class _ChartState extends State<Chart> {
                       dataLabelSettings: DataLabelSettings(isVisible: true))
                 ]);
           } else {
-            return const Text('no data or erro');
+            return const Center(child: CircularProgressIndicator());
           }
         },
       ),
