@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:logger/logger.dart';
-import 'package:get/get.dart';
-
 class Chart extends StatefulWidget {
   const Chart({Key? key}) : super(key: key);
 
@@ -41,8 +39,8 @@ class _ChartState extends State<Chart> {
   ];
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: Column(children: [
+    return 
+        Column(children: [
       //Initialize the chart widget
       FutureBuilder<QuerySnapshot>(
         future: FirebaseFirestore.instance.collection('exchange-daily').get(),
@@ -63,7 +61,7 @@ class _ChartState extends State<Chart> {
 
               DateTime parsedDate = DateTime.parse(document.id);
               data.add(_SalesData(parsedDate.day.toString(),
-                  oneDay['anis'][0][dropdownvalue].toDouble()));
+                  oneDay['anis'][0][codeCurrency].toDouble()));
             }
             currecies = templist[0];
             logger.wtf(currecies);
@@ -86,7 +84,7 @@ class _ChartState extends State<Chart> {
 
                         // Enable data label
 
-                        dataLabelSettings: DataLabelSettings(isVisible: true))
+                        dataLabelSettings: const DataLabelSettings(isVisible: true))
                   ],
                 ),
                 DropdownButton(
@@ -120,6 +118,6 @@ class _ChartState extends State<Chart> {
           }
         },
       ),
-    ]));
+    ]);
   }
 }

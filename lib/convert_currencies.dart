@@ -1,5 +1,7 @@
 import "package:flutter/material.dart";
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 
 class Controller extends GetxController {
   final txtList = TextEditingController();
@@ -12,17 +14,15 @@ class Controller extends GetxController {
       controllerText.value = txtList.text;
     });
 
-    debounce(controllerText, (_) {
-      print("debouce$_");
-    }, time: Duration(microseconds: 10));
     super.onInit();
   }
 }
 
+// ignore: must_be_immutable
 class Convert extends StatefulWidget {
-  var buyPrice = 0.0;
-  var sellPrice = 0.0;
-  var currency = "";
+  double buyPrice = 0.0;
+  double sellPrice = 0.0;
+  String currency = "";
 
   Convert(
       {Key? key,
@@ -36,8 +36,8 @@ class Convert extends StatefulWidget {
 }
 
 class _ConvertState extends State<Convert> with TickerProviderStateMixin {
-  final double widgetATop = 20;
-  final double widgetBTop = 110;
+  final double widgetATop = 25;
+  final double widgetBTop = 115;
   bool swapped = false;
 
   late AnimationController animateController;
@@ -72,77 +72,107 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
   }
 
   //
-  var controller = Get.put(Controller());
-  var todinar = true.obs;
+  Controller controller = Get.put(Controller());
+
+  RxBool todinar = true.obs;
+  NumberFormat f = NumberFormat("#,###,###.########", "en_US");
 
   // func to convert from and to algerian dinar deprending on a state
-  String value(istrue, sell, buy) {
-    if (istrue) {
-      return (double.parse(controller.controllerText.value.isNotEmpty
-                  ? controller.controllerText.value
-                  : "0") *
-              buy)
-          .toStringAsFixed(2);
+  String convertedValue(istrue, sell, buy) {
+    String input = controller.controllerText.value;
+     if (istrue) {
+      return f.format(double.parse(input.isNotEmpty ? input : "0") * buy);
     } else {
-      return (double.parse(controller.controllerText.value.isNotEmpty
-                  ? controller.controllerText.value
-                  : "0") /
-              sell)
-          .toStringAsFixed(2);
+      return f.format(double.parse(input.isNotEmpty ? input : "0") / sell);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    var tweenValue = addressAnimation.value;
+    double tweenValue = addressAnimation.value;
 
     return Stack(children: [
-      Row(
-        children: [
-          Obx(
-            () => Text(todinar.value == true
-                ? "Convert from ${widget.currency} to Dinar"
-                : 'Convert from Dinar to ${widget.currency}'),
-          )
-        ],
-      ),
       Positioned(
         top: widgetATop + tweenValue,
         child: Card(
+          shape: const RoundedRectangleBorder(
+            side: BorderSide(
+              color: Colors.blueGrey, //<-- SEE HERE
+            ),
+          ),
           color: Colors.white,
           elevation: 50,
           child: SizedBox(
             height: 50,
             width: 280,
-            child: Row(children: [
-              Image.asset(
-                'icons/currency/${widget.currency.toLowerCase()}.png',
-                package: 'currency_icons',
-              ),
-              Flexible(
-                child: todinar == true
-                    ? TextFormField(
-                        keyboardType: TextInputType.number,
-                        controller: controller.txtList,
-                      )
-                    : Obx(
-                        () => Text(value(
-                            todinar.value, widget.sellPrice, widget.buyPrice)),
-                      ),
-              ),
-            ]),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    height: 50,
+                    child: Container(
+                      color: Colors.blueGrey,
+                      child: Row(children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SizedBox(
+                            height: 15,
+                            child: Image.asset(
+                              'icons/currency/${widget.currency.toLowerCase()}.png',
+                              package: 'currency_icons',
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            widget.currency.toUpperCase(),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: Colors.white),
+                          ),
+                        )
+                      ]),
+                    ),
+                  ),
+                  Flexible(
+                    child: todinar.value
+                        ? TextFormField(
+                            inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    (RegExp('[0-9.]')))
+                              ],
+                            keyboardType: TextInputType.number,
+                            controller: controller.txtList,
+                            decoration: const InputDecoration(
+                              hintText: 'Enter amount',
+                              border: InputBorder.none,
+                            ),
+                            textAlign: TextAlign.right,
+                            style:
+                                TextStyle(fontSize: 20.0, color: Colors.black))
+                        : Obx(
+                            () => SelectableText(
+                                convertedValue(todinar.value, widget.sellPrice,
+                                    widget.buyPrice),
+                                style: TextStyle(
+                                    fontSize: 20.0, color: Colors.black)),
+                          ),
+                  ),
+                ]),
           ),
         ),
       ),
       Positioned(
         right: 50,
-        top: 80,
+        top: 85,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             GestureDetector(
                 onTap: () {
-                  //from stackoverlow
+                  //from stackoverflow
                   //That is value xor-equals true, which will flip it every time,
                   //and without any branching or temporary variables.
                   //todinar.value ^= true;
@@ -166,39 +196,98 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
       Positioned(
         top: widgetBTop - tweenValue,
         child: Card(
-          color: Colors.white,
-          elevation: 50,
+          shape: const RoundedRectangleBorder(
+            side: BorderSide(
+              color: Colors.blueGrey, //<-- SEE HERE
+            ),
+          ),
           child: SizedBox(
               height: 50,
               width: 280,
-              //check if the value of the input text is not an empty string
-              //to avoid invalid double when the user removes values
-
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Image.asset(
-                    'icons/currency/dzd.png',
-                    package: 'currency_icons',
+                  SizedBox(
+                    height: 50,
+                    child: Container(
+                      color: Colors.blueGrey,
+                      child: Row(children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SizedBox(
+                            height: 15,
+                            child: Image.asset(
+                              'icons/currency/dzd.png',
+                              package: 'currency_icons',
+                            ),
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'DZD',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: Colors.white),
+                          ),
+                        )
+                      ]),
+                    ),
                   ),
-                  todinar == true
-                      ? Obx(
-                          () => Text(value(todinar.value, widget.sellPrice,
-                              widget.buyPrice)),
+                  todinar.isTrue
+                      ? Flexible(
+                          child: Obx(
+                            () => SelectableText(
+                                convertedValue(todinar.value, widget.sellPrice,
+                                    widget.buyPrice),
+                                style: TextStyle(
+                                    fontSize: 20.0, color: Colors.black)),
+                          ),
                         )
                       : Flexible(
                           child: TextFormField(
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    (RegExp('[0-9.]')))
+                              ],
                               keyboardType: TextInputType.number,
                               controller: controller.txtList,
                               decoration: const InputDecoration(
                                 hintText: 'Enter amount',
                                 border: InputBorder.none,
                               ),
-                              textAlign: TextAlign.right),
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                  fontSize: 20.0, color: Colors.black)),
                         ),
                 ],
               )),
         ),
       ),
+      Positioned(
+          bottom: 5,
+          right: 10,
+          left: 10,
+          child: Center(
+            child: Card(
+              child: todinar.isTrue
+                  ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                          '1 ${widget.currency.toUpperCase()} = ${1 * widget.buyPrice} DZD',
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        '1 DZD  = ${f.format(1 / widget.buyPrice)} ${widget.currency.toUpperCase()}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold), // give any color here
+                      ),
+                    ),
+            ),
+          ))
     ]);
   }
 }
