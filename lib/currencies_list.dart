@@ -155,34 +155,19 @@ class _CurrenciesListState extends State<CurrenciesList> {
                     child: Card(
                       elevation: 100,
                       child: Container(
-                        height: 350,
+                        height: 200,
                         width: 300,
-                        color: const Color.fromARGB(83, 255, 7, 7),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                    onPressed: () {
-                                      isShow.value = false;
-                                    },
-                                    icon: const Icon(
-                                        Icons.one_x_mobiledata_rounded))
-                              ],
-                            ),
-                            Convert(
-                              buyPrice: buy_price.value,
-                              sellPrice: sellPrice.value,
-                              currency: currencyCode.value,
-                            ),
-                          ],
+                        color: Color.fromARGB(249, 255, 7, 7),
+                        child: Convert(
+                          buyPrice: buy_price.value,
+                          sellPrice: sellPrice.value,
+                          currency: currencyCode.value,
                         ),
                       ),
                     ),
                   ),
                 ),
-              )
+              ),
             ]);
           }
           if (snapshot.hasError) {
