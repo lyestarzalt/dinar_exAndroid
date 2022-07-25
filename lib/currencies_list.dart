@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'convert_currencies.dart';
 import 'util.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 class CurrenciesList extends StatefulWidget {
   const CurrenciesList({Key? key}) : super(key: key);
@@ -28,6 +29,8 @@ class _CurrenciesListState extends State<CurrenciesList> {
       future: FirebaseFirestore.instance.collection('exchange-daily').get(),
 
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        var logger = Logger();
+ 
         if (snapshot.hasData) {
           Map<String, dynamic> yesterayPrice =
               snapshot.data!.docs[snapshot.data!.docs.length - 2].data()

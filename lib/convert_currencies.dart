@@ -80,7 +80,7 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
   // func to convert from and to algerian dinar deprending on a state
   String convertedValue(istrue, sell, buy) {
     String input = controller.controllerText.value;
-     if (istrue) {
+    if (istrue) {
       return f.format(double.parse(input.isNotEmpty ? input : "0") * buy);
     } else {
       return f.format(double.parse(input.isNotEmpty ? input : "0") / sell);
@@ -271,6 +271,12 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
           left: 10,
           child: Center(
             child: Card(
+                child: AnimatedSwitcher(
+              reverseDuration: const Duration(seconds: 1),
+              duration: const Duration(seconds: 3),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return ScaleTransition(child: child, scale: animation);
+              },
               child: todinar.isTrue
                   ? Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -286,7 +292,7 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
                             fontWeight: FontWeight.bold), // give any color here
                       ),
                     ),
-            ),
+            )),
           ))
     ]);
   }

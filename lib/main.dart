@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'currencies_list.dart';
 import 'package:get/get.dart';
 import 'trends.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -32,8 +33,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onItemTapped(index) {
     selectedIndex.value = index;
   }
+   List<charts.Series<dynamic, DateTime>> seriesList =[];
 
-  static const List<Widget> _widgetOptions = <Widget>[
+  static  List<Widget> _widgetOptions = <Widget>[
     CurrenciesList(),
     Chart()
   ];
