@@ -7,6 +7,12 @@ import 'package:dinar_ex/chart/datum.dart';
 import 'data_loader.dart';
 
 class StockChartExample extends StatefulWidget {
+  late List<ValueDinar> data = [];
+  StockChartExample({
+    Key? key,
+    required this.data,
+  }) : super(key: key);
+
   @override
   _StockChartExampleState createState() => _StockChartExampleState();
 }
@@ -35,7 +41,7 @@ class _StockChartExampleState extends State<StockChartExample> {
   }
 
   void _prepareStockData() async {
-    final List<Value> data = await loadStockData();
+    final List<ValueDinar> data = await widget.data;
 
     double minY = double.maxFinite;
     double maxY = double.minPositive;
@@ -86,7 +92,7 @@ class _StockChartExampleState extends State<StockChartExample> {
       gradientTo: const Offset(0.5, 1),
       barWidth: 2,
       isStrokeCapRound: true,
-      dotData:  FlDotData(show: false),
+      dotData: FlDotData(show: false),
       belowBarData: BarAreaData(
         show: true,
         colors: _gradientColors.map((color) => color.withOpacity(0.3)).toList(),
@@ -100,7 +106,6 @@ class _StockChartExampleState extends State<StockChartExample> {
   SideTitles _leftTitles() {
     return SideTitles(
       showTitles: true,
-
       getTitles: (value) =>
           NumberFormat.compactCurrency(symbol: '').format(value),
       reservedSize: 28,
@@ -112,7 +117,6 @@ class _StockChartExampleState extends State<StockChartExample> {
   SideTitles _bottomTitles() {
     return SideTitles(
       showTitles: true,
-
       getTitles: (value) {
         final DateTime date =
             DateTime.fromMillisecondsSinceEpoch(value.toInt());
@@ -129,7 +133,7 @@ class _StockChartExampleState extends State<StockChartExample> {
       show: true,
       drawVerticalLine: false,
       getDrawingHorizontalLine: (value) {
-        return  FlLine(
+        return FlLine(
           color: Colors.white12,
           strokeWidth: 1,
         );
@@ -147,7 +151,9 @@ class _StockChartExampleState extends State<StockChartExample> {
       child: Padding(
         padding:
             const EdgeInsets.only(right: 18.0, left: 12.0, top: 24, bottom: 12),
-        child: _values.isEmpty ? const Placeholder() : LineChart(_mainData()),
+        child: _values.isEmpty
+            ? Center(child: CircularProgressIndicator())
+            : LineChart(_mainData()),
       ),
     );
   }

@@ -6,17 +6,28 @@ import 'currencies_list.dart';
 import 'package:get/get.dart';
 import 'trends.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
-import 'dart:math';
+import 'package:firebase_auth/firebase_auth.dart';
 
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 void main() async {
-
-  
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  try {
+    final userCredential = await FirebaseAuth.instance.signInAnonymously();
+    print("Signed in with temporary account.");
+  } on FirebaseAuthException catch (e) {
+    switch (e.code) {
+      case "operation-not-allowed":
+        print("Anonymous auth hasn't been enabled for this project.");
+        break;
+      default:
+        print("Unknown error.");
+    }
+  }
 
   runApp(
     const MyHomePage(),
@@ -36,7 +47,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onItemTapped(index) {
     selectedIndex.value = index;
   }
-   List<charts.Series<dynamic, DateTime>> seriesList =[];
+
+  List<charts.Series<dynamic, DateTime>> seriesList = [];
 
   static const List<Widget> _widgetOptions = <Widget>[
     CurrenciesList(),
@@ -47,9 +59,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('dinar exchange debug'),
-        ),
         bottomNavigationBar: Obx(() => BottomNavigationBar(
               items: const <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
