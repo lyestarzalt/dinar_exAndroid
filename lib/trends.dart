@@ -3,6 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logger/logger.dart';
 import 'package:get/get.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'dart:math';
+import 'package:fl_chart/fl_chart.dart';
+import 'chart/line_chart.dart';
 
 class Chart extends StatefulWidget {
   const Chart({Key? key}) : super(key: key);
@@ -49,6 +52,18 @@ class _ChartState extends State<Chart> {
     ];
   }
 
+  List<charts.TickSpec<num>> _createTickSpec(double minVal, double maxVal) {
+    List<charts.TickSpec<num>> _tickProvidSpecs = [];
+    int d = minVal.toInt();
+    while (d <= maxVal) {
+      _tickProvidSpecs.add(charts.TickSpec(d,
+          label: '$d', style: charts.TextStyleSpec(fontSize: 14)));
+      d += 1;
+    }
+
+    return _tickProvidSpecs;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(children: [
@@ -58,7 +73,7 @@ class _ChartState extends State<Chart> {
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasData) {
             List<TimeSeriesSales> data = [];
-
+            var values = [];
             var logger = Logger();
 
             var value = snapshot.data!.docs;
@@ -75,9 +90,14 @@ class _ChartState extends State<Chart> {
               var code = codeCurrency;
               data.add(TimeSeriesSales(
                   parsedDate, oneDay['anis'][0][dropdownvalue].toDouble()));
+              values.add(oneDay['anis'][0][dropdownvalue].toDouble());
             }
+
+            double yMin = values.cast<double>().reduce(min);
+            double yMax = values.cast<double>().reduce(max);
+
             currecies = templist[0];
-            logger.wtf(data);
+            logger.wtf(yMin);
             return SizedBox(
               width: 500,
               height: 300,
@@ -89,13 +109,16 @@ class _ChartState extends State<Chart> {
                 // specified, the default creates local date time.
                 dateTimeFactory: const charts.LocalDateTimeFactory(),
 
-                domainAxis: const charts.DateTimeAxisSpec(
-                  tickProviderSpec: charts.DayTickProviderSpec(increments: [3]),
-                  tickFormatterSpec: charts.AutoDateTimeTickFormatterSpec(
-             
+                primaryMeasureAxis: new charts.NumericAxisSpec(
+                  tickProviderSpec: new charts.StaticNumericTickProviderSpec(
+                    _createTickSpec(yMin, yMax),
                   ),
+                ),
+
+                domainAxis: const charts.DateTimeAxisSpec(
+                  tickProviderSpec: charts.DayTickProviderSpec(increments: [1]),
+                  tickFormatterSpec: charts.AutoDateTimeTickFormatterSpec(),
                   showAxisLine: false,
-                  
                 ),
               ),
             );
@@ -104,6 +127,7 @@ class _ChartState extends State<Chart> {
           }
         },
       ),
+      StockChartExample()
     ]);
   }
 }

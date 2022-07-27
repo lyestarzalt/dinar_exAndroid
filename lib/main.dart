@@ -6,10 +6,13 @@ import 'currencies_list.dart';
 import 'package:get/get.dart';
 import 'trends.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'dart:math';
 
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 void main() async {
+
+  
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -35,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
    List<charts.Series<dynamic, DateTime>> seriesList =[];
 
-  static  List<Widget> _widgetOptions = <Widget>[
+  static const List<Widget> _widgetOptions = <Widget>[
     CurrenciesList(),
     Chart()
   ];
