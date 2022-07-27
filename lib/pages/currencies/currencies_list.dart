@@ -1,19 +1,12 @@
+import 'package:dinar_ex/pages/currencies/currencies_controller.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'convert_currencies.dart';
-import 'util.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
-class CurrenciesList extends StatefulWidget {
-  const CurrenciesList({Key? key}) : super(key: key);
-
-  @override
-  State<CurrenciesList> createState() => _CurrenciesListState();
-}
-
-class _CurrenciesListState extends State<CurrenciesList> {
+class CurrenciesList extends GetView<CurrenciesController> {
   RxDouble buyPrice = 0.0.obs;
   RxDouble sellPrice = 0.0.obs;
   RxString currencyCode = "".obs;
@@ -30,7 +23,7 @@ class _CurrenciesListState extends State<CurrenciesList> {
 
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         var logger = Logger();
- 
+
         if (snapshot.hasData) {
           Map<String, dynamic> yesterayPrice =
               snapshot.data!.docs[snapshot.data!.docs.length - 2].data()
@@ -61,9 +54,7 @@ class _CurrenciesListState extends State<CurrenciesList> {
                 var percent = 0.0.obs;
                 iconItem.value = todayBuyPricesMap.keys.toList()[index];
                 //
-                countryName.value = codeToCountry[
-                    todayBuyPricesMap.keys.toList()[index].toUpperCase()];
-                //
+
                 currencyCodeItem.value =
                     todayBuyPricesMap.keys.toList()[index].toUpperCase();
 //

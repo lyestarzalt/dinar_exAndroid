@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:logger/logger.dart';
 import 'package:get/get.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
-import 'dart:math';
-import 'package:fl_chart/fl_chart.dart';
-import 'chart/line_chart.dart';
-import 'chart/datum.dart';
+import 'line_chart.dart';
+import 'datum.dart';
 
 class Chart extends StatefulWidget {
   const Chart({Key? key}) : super(key: key);

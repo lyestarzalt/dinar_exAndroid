@@ -2,21 +2,8 @@ import "package:flutter/material.dart";
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
+import 'currencies_controller.dart';
 
-class Controller extends GetxController {
-  final txtList = TextEditingController();
-
-  RxString controllerText = '0.0'.obs;
-
-  @override
-  void onInit() {
-    txtList.addListener(() {
-      controllerText.value = txtList.text;
-    });
-
-    super.onInit();
-  }
-}
 
 // ignore: must_be_immutable
 class Convert extends StatefulWidget {
@@ -72,7 +59,7 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
   }
 
   //
-  Controller controller = Get.put(Controller());
+  CurrenciesController controller = Get.put(CurrenciesController());
 
   RxBool todinar = true.obs;
   NumberFormat f = NumberFormat("#,###,###.########", "en_US");
