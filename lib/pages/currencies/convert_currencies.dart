@@ -2,21 +2,7 @@ import "package:flutter/material.dart";
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
-
-class Controller extends GetxController {
-  final txtList = TextEditingController();
-
-  RxString controllerText = '0.0'.obs;
-
-  @override
-  void onInit() {
-    txtList.addListener(() {
-      controllerText.value = txtList.text;
-    });
-
-    super.onInit();
-  }
-}
+import 'currencies_controller.dart';
 
 // ignore: must_be_immutable
 class Convert extends StatefulWidget {
@@ -38,7 +24,6 @@ class Convert extends StatefulWidget {
 class _ConvertState extends State<Convert> with TickerProviderStateMixin {
   final double widgetATop = 25;
   final double widgetBTop = 115;
-  bool swapped = false;
 
   late AnimationController animateController;
   late Animation<double> addressAnimation;
@@ -72,9 +57,8 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
   }
 
   //
-  Controller controller = Get.put(Controller());
+  CurrenciesController controller = Get.put(CurrenciesController());
 
-  RxBool todinar = true.obs;
   NumberFormat f = NumberFormat("#,###,###.########", "en_US");
 
   // func to convert from and to algerian dinar deprending on a state
@@ -137,7 +121,7 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
                     ),
                   ),
                   Flexible(
-                    child: todinar.value
+                    child: controller.todinar.value
                         ? TextFormField(
                             inputFormatters: [
                                 FilteringTextInputFormatter.allow(
@@ -154,8 +138,8 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
                                 TextStyle(fontSize: 20.0, color: Colors.black))
                         : Obx(
                             () => SelectableText(
-                                convertedValue(todinar.value, widget.sellPrice,
-                                    widget.buyPrice),
+                                convertedValue(controller.todinar.value,
+                                    widget.sellPrice, widget.buyPrice),
                                 style: TextStyle(
                                     fontSize: 20.0, color: Colors.black)),
                           ),
@@ -175,15 +159,13 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
                   //from stackoverflow
                   //That is value xor-equals true, which will flip it every time,
                   //and without any branching or temporary variables.
-                  //todinar.value ^= true;
 
                   //or this
-                  todinar.value = !todinar.value;
                   setState(() {
-                    swapped
+                    controller.flip();
+                    controller.todinar.value
                         ? animateController.reverse()
                         : animateController.forward();
-                    swapped = !swapped;
                   });
                 },
                 child: const CircleAvatar(
@@ -235,12 +217,12 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
                       ]),
                     ),
                   ),
-                  todinar.isTrue
+                  controller.todinar.isTrue
                       ? Flexible(
                           child: Obx(
                             () => SelectableText(
-                                convertedValue(todinar.value, widget.sellPrice,
-                                    widget.buyPrice),
+                                convertedValue(controller.todinar.value,
+                                    widget.sellPrice, widget.buyPrice),
                                 style: TextStyle(
                                     fontSize: 20.0, color: Colors.black)),
                           ),
@@ -277,7 +259,7 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
               transitionBuilder: (Widget child, Animation<double> animation) {
                 return ScaleTransition(child: child, scale: animation);
               },
-              child: todinar.isTrue
+              child: controller.todinar.isTrue
                   ? Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(

@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:logger/logger.dart';
 import 'package:get/get.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
-import 'dart:math';
-import 'package:fl_chart/fl_chart.dart';
-import 'chart/line_chart.dart';
-import 'chart/datum.dart';
+import 'package:dinar_ex/pages/trends/trend_controller.dart';
+import 'line_chart.dart';
+import 'datum.dart';
 
 class Chart extends StatefulWidget {
   const Chart({Key? key}) : super(key: key);
@@ -16,8 +13,6 @@ class Chart extends StatefulWidget {
 }
 
 class _ChartState extends State<Chart> {
-  final List<charts.Series<dynamic, DateTime>> seriesList = [];
-
   List<String> currecies = [];
   RxList anis = [].obs;
   var templist = [];
@@ -37,7 +32,7 @@ class _ChartState extends State<Chart> {
     "tnd",
     "cny"
   ];
-
+  TrendsController controller = Get.find<TrendsController>();
   @override
   Widget build(BuildContext context) {
     return Column(children: [
@@ -73,7 +68,10 @@ class _ChartState extends State<Chart> {
           }
         },
       ),
-
+      ElevatedButton(
+        onPressed: () => controller.changeAppTheme(),
+        child: Text('chage'),
+      ),
       DropdownButton(
         // Initial Value
         value: dropdownvalue,

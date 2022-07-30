@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:fl_chart/fl_chart.dart';
-import 'package:dinar_ex/chart/datum.dart';
+import 'package:dinar_ex/pages/trends/datum.dart';
 import 'data_loader.dart';
 
 class StockChartExample extends StatefulWidget {
-  late List<ValueDinar> data = [];
+  List<ValueDinar> data = [];
   StockChartExample({
     Key? key,
     required this.data,

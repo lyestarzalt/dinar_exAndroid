@@ -1,36 +1,29 @@
+import 'package:dinar_ex/pages/currencies/currencies_controller.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'convert_currencies.dart';
-import 'util.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
-class CurrenciesList extends StatefulWidget {
-  const CurrenciesList({Key? key}) : super(key: key);
-
-  @override
-  State<CurrenciesList> createState() => _CurrenciesListState();
-}
-
-class _CurrenciesListState extends State<CurrenciesList> {
+class CurrenciesList extends GetView<CurrenciesController> {
   RxDouble buyPrice = 0.0.obs;
   RxDouble sellPrice = 0.0.obs;
   RxString currencyCode = "".obs;
-  RxBool isShow = false.obs;
   RxInt selectedIndex = 0.obs;
 
   //
   @override
   Widget build(BuildContext context) {
+    final CurrenciesController _controller = Get.put(CurrenciesController());
+
     return FutureBuilder<QuerySnapshot>(
       // inside the <> you enter the type of your stream
 
       future: FirebaseFirestore.instance.collection('exchange-daily').get(),
 
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        var logger = Logger();
- 
+
         if (snapshot.hasData) {
           Map<String, dynamic> yesterayPrice =
               snapshot.data!.docs[snapshot.data!.docs.length - 2].data()
@@ -61,9 +54,7 @@ class _CurrenciesListState extends State<CurrenciesList> {
                 var percent = 0.0.obs;
                 iconItem.value = todayBuyPricesMap.keys.toList()[index];
                 //
-                countryName.value = codeToCountry[
-                    todayBuyPricesMap.keys.toList()[index].toUpperCase()];
-                //
+
                 currencyCodeItem.value =
                     todayBuyPricesMap.keys.toList()[index].toUpperCase();
 //
@@ -88,7 +79,7 @@ class _CurrenciesListState extends State<CurrenciesList> {
                         buyPrice = buyPriceItem;
                         sellPrice = sellPriceItem;
                         currencyCode = currencyCodeItem;
-                        isShow.value = true;
+                        _controller.isShow.value = true;
                       },
                       child: Row(
                         children: [
@@ -136,7 +127,7 @@ class _CurrenciesListState extends State<CurrenciesList> {
             ),
             Obx(
               () => Visibility(
-                visible: isShow.value,
+                visible: _controller.isShow.value,
                 child: Align(
                   alignment: Alignment.center,
                   child: SizedBox(
@@ -149,10 +140,9 @@ class _CurrenciesListState extends State<CurrenciesList> {
                           children: [
                             IconButton(
                                 onPressed: () {
-                                  isShow.value = false;
-                                  //reset the textfiled controller in the conver
+                                  _controller.isShow.value = false;
+                                  //reset the textfiled _controller in the conver
                                   //page
-                                  Get.deleteAll();
                                 },
                                 icon: const Icon(Icons.cancel)),
                           ],

@@ -1,17 +1,25 @@
+import 'package:dinar_ex/pages/dashboard/dashboard_binding.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'currencies_list.dart';
 import 'package:get/get.dart';
-import 'trends.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'routes/app_pages.dart';
+import 'routes/app_routes.dart';
+import 'package:dinar_ex/theme/controller/theme_controller.dart';
+import 'package:dinar_ex/theme/theme.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter(); // Initialize Hive
+  await Hive.openBox('settings'); // Open the box that will store the settings
+
+  DashboardBinding().dependencies();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -25,60 +33,30 @@ void main() async {
         print("Anonymous auth hasn't been enabled for this project.");
         break;
       default:
-        print("Unknown error.");
+        print("Unknown error.${e.code}");
     }
   }
 
   runApp(
-    const MyHomePage(),
+    MyHomePage(),
   );
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required}) : super(key: key);
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  var selectedIndex = 0.obs;
-
-  void _onItemTapped(index) {
-    selectedIndex.value = index;
-  }
-
-  List<charts.Series<dynamic, DateTime>> seriesList = [];
-
-  static const List<Widget> _widgetOptions = <Widget>[
-    CurrenciesList(),
-    Chart()
-  ];
+class MyHomePage extends StatelessWidget {
+  final ThemeController _themeController = Get.put(ThemeController());
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      home: Scaffold(
-        bottomNavigationBar: Obx(() => BottomNavigationBar(
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.attach_money_sharp),
-                  label: 'List',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.trending_up_rounded),
-                  label: 'chart',
-                ),
-              ],
-              currentIndex: selectedIndex.value,
-              selectedItemColor: Colors.amber[800],
-              onTap: (_onItemTapped),
-            )),
-        body: Obx(
-          () => _widgetOptions.elementAt(selectedIndex.value),
-          // This trailing comma makes auto-formatting nicer for build methods.
-        ),
-      ),
+            initialBinding: DashboardBinding(),
+
+      initialRoute: AppRoutes.DASHBOARD,
+      getPages: AppPages.list,
+      debugShowCheckedModeBanner: false,
+      themeMode: _themeController
+          .themeStateFromHiveSettingBox, // Setting the ThemeMode from the Hive Setting Box
+      theme: CustomTheme.lightTheme, // CustomThemeData for Light Theme
+      darkTheme: CustomTheme.darkTheme,
     );
   }
 }
