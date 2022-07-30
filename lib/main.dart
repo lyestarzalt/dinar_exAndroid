@@ -48,7 +48,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-            initialBinding: DashboardBinding(),
+      initialBinding: DashboardBinding(),
 
       initialRoute: AppRoutes.DASHBOARD,
       getPages: AppPages.list,

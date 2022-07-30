@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:dinar_ex/pages/trends/trend_controller.dart';
+
 import 'line_chart.dart';
 import 'datum.dart';
 
