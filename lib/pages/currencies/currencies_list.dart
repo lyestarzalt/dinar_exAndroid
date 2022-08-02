@@ -1,10 +1,9 @@
-import 'package:dinar_ex/pages/currencies/currencies_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'convert_currencies.dart';
 import 'package:get/get.dart';
-import 'package:dinar_ex/pages/currencies/currencies_model.dart';
 import 'package:dinar_ex/pages/currencies/util.dart';
+import 'package:dinar_ex/pages/currencies/currencies_model.dart';
 
 class CurrenciesList extends StatefulWidget {
   //
@@ -33,7 +32,6 @@ class _CurrenciesListState extends State<CurrenciesList> {
 
   @override
   Widget build(BuildContext context) {
-    print('currencies list rebuild');
     return StreamBuilder<QuerySnapshot>(
         // inside the <> you enter the type of your stream
 
@@ -45,27 +43,13 @@ class _CurrenciesListState extends State<CurrenciesList> {
           } else if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           } else {
-            String todaydate = snapshot.data!.docs.last.id;
-            Map<String, dynamic> yesterayPrice =
-                snapshot.data!.docs[snapshot.data!.docs.length - 2].data()
-                    as Map<String, dynamic>;
-
-            Map<String, dynamic> todayPrices =
-                snapshot.data!.docs.last.data() as Map<String, dynamic>;
-            Map<String, dynamic> yesterayPriceBuyMap = yesterayPrice['anis'][1];
-
-            Map<String, dynamic> todayBuyPricesMap = todayPrices['anis'][1];
-            Map<String, dynamic> todaySellPricesMap = todayPrices['anis'][0];
-            int itemCount = todayBuyPricesMap.length;
-/*             for (var anis in todayBuyPricesMap.keys) {
-              currency(anis);
-            } */
+            var dinar = CurrenciesModel.fromDocumentSnapshot(snapshot);
             return Scaffold(
               body: Stack(children: [
                 RefreshIndicator(
                   onRefresh: () async {},
                   child: ListView.builder(
-                    itemCount: itemCount,
+                    itemCount: dinar.currenciescount,
                     itemBuilder: (context, index) {
                       // get the code for each counrty to set the image icon
                       var iconItem = "".obs;
@@ -75,26 +59,31 @@ class _CurrenciesListState extends State<CurrenciesList> {
                       var buyPriceItem = 0.0.obs;
                       var sellPriceItem = 0.0.obs;
                       var percent = 0.0.obs;
-                      iconItem.value = todayBuyPricesMap.keys.toList()[index];
+                      iconItem.value =
+                          dinar.todayBuyPricesMap!.keys.toList()[index];
                       //
-                      currencyCodeItem.value =
-                          todayBuyPricesMap.keys.toList()[index].toUpperCase();
-                      //
-                      yesterdayBuyPriceItem.value =
-                          yesterayPriceBuyMap.values.toList()[index].toDouble();
-
-                      buyPriceItem.value =
-                          todayBuyPricesMap.values.toList()[index].toDouble();
-
-                      sellPriceItem.value =
-                          todaySellPricesMap.values.toList()[index].toDouble();
+                      currencyCodeItem.value = dinar.todayBuyPricesMap!.keys
+                          .toList()[index]
+                          .toUpperCase();
+                      //dinar.yesterayBuyPricesMap!
+                      yesterdayBuyPriceItem.value = dinar
+                          .yesterayPrice!['anis'][1].values
+                          .toList()[index]
+                          .toDouble();
+        
+                      buyPriceItem.value = dinar.todayBuyPricesMap!.values
+                          .toList()[index]
+                          .toDouble();
+                      sellPriceItem.value = dinar.todaySellPricesMap!.values
+                          .toList()[index]
+                          .toDouble();
                       percent.value = ((1 -
                               (yesterdayBuyPriceItem.value /
                                   buyPriceItem.value)) *
                           100);
                       //our main list
                       //Using a list of rows instead of Listile becuase we can have much more customizability
-                      return Obx(() => Container(
+                      return Obx(() => SizedBox(
                             height: 70,
                             child: Card(
                               elevation: 10,
@@ -134,7 +123,7 @@ class _CurrenciesListState extends State<CurrenciesList> {
                                             ),
                                           ],
                                         ),
-                                        SizedBox(height: 3),
+                                        const SizedBox(height: 3),
                                         Padding(
                                           padding: const EdgeInsets.fromLTRB(
                                               5, 0, 0, 0),
@@ -169,7 +158,7 @@ class _CurrenciesListState extends State<CurrenciesList> {
                                     SizedBox(
                                       width: 30,
                                       child: Text(
-                                        "${buyPriceItem.value.toStringAsFixed(0)}",
+                                        buyPriceItem.value.toStringAsFixed(0),
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyText1,

@@ -75,7 +75,6 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    print('convert build');
     double tweenValue = addressAnimation.value;
 
     return Stack(children: [
@@ -137,12 +136,12 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
                             ),
                             textAlign: TextAlign.right,
                             style:
-                                TextStyle(fontSize: 20.0, color: Colors.black))
+                                const TextStyle(fontSize: 20.0, color: Colors.black))
                         : Obx(
                             () => SelectableText(
                                 convertedValue(todinar.value, widget.sellPrice,
                                     widget.buyPrice),
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 20.0, color: Colors.black)),
                           ),
                   ),
@@ -224,7 +223,7 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
                             () => SelectableText(
                                 convertedValue(todinar.value, widget.sellPrice,
                                     widget.buyPrice),
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 20.0, color: Colors.black)),
                           ),
                         )
@@ -241,7 +240,7 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
                                 border: InputBorder.none,
                               ),
                               textAlign: TextAlign.right,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 20.0, color: Colors.black)),
                         ),
                 ],

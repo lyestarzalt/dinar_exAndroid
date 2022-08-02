@@ -8,7 +8,6 @@ class Settigns extends StatelessWidget {
       Get.put(SettignsController(), permanent: true);
   @override
   Widget build(BuildContext context) {
-    printError(info: "page");
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -23,30 +22,29 @@ class Settigns extends StatelessWidget {
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.1,
           ),
-          Text(
+          const Text(
             ' Dark mode',
             style: TextStyle(fontSize: 15),
           ),
-          Divider(
+          const Divider(
             thickness: 2,
           ),
           Obx(() => Switch(
               value: controller.isDarkMode.value,
               onChanged: (val) {
                 controller.changeAppTheme();
-                //print(val);
               })),
-          SizedBox(
+          const SizedBox(
             height: 50,
           ),
-          Text(' General', style: TextStyle(fontSize: 15)),
-          Divider(
+          const Text(' General', style: TextStyle(fontSize: 15)),
+          const Divider(
             thickness: 2,
           ),
           Row(
             children: [
-              IconButton(onPressed: () {}, icon: Icon(Icons.emoji_emotions)),
-              Text(
+              IconButton(onPressed: () {}, icon: const Icon(Icons.emoji_emotions)),
+              const Text(
                 'Rate us',
                 style: TextStyle(fontSize: 15),
               ),
@@ -68,10 +66,10 @@ class Settigns extends StatelessWidget {
                     ],
                   );
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.info,
                 )),
-            Text(
+            const Text(
               'About us',
               style: TextStyle(fontSize: 15),
             ),

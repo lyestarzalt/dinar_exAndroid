@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:get/get.dart';
 import 'line_chart.dart';
 import 'datum.dart';
 
@@ -17,7 +16,7 @@ class _ChartState extends State<Chart> {
       FirebaseFirestore.instance.collection('exchange-daily').get();
 
   // List of items in our dropdown menu
-  List<String> itemss = [];
+  List<String> currenciesCodes = [];
   var _collection;
   @override
   void initState() {
@@ -32,49 +31,47 @@ class _ChartState extends State<Chart> {
       FutureBuilder<QuerySnapshot>(
         future: _collection,
         builder: (BuildContext context, snapshot) {
-          print('trend page rebuild');
-
           if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasData) {
-            List<QueryDocumentSnapshot<Object?>> value = snapshot.data!.docs;
-            print('trends list rebuild2');
+            List<QueryDocumentSnapshot<Object?>> allDocuments =
+                snapshot.data!.docs;
 
             final List<dynamic> tempList = [];
-            final List<List<String>> currencyCode = [];
-            Map<dynamic, dynamic> test =
-                value.last.data() as Map<dynamic, dynamic>;
-            Map<String, dynamic> lol = test['anis'][0];
-            itemss = lol.keys.toList();
-            print(itemss);
-            for (var document in value) {
+
+            //? get last day and store every key to the curreincesCodes list
+            //? to be used in the dropdown menu
+            Map<dynamic, dynamic> lastDay =
+                allDocuments.last.data() as Map<dynamic, dynamic>;
+
+            Map<String, dynamic> curenciesMap = lastDay['anis'][0];
+            currenciesCodes = curenciesMap.keys.toList();
+
+            //? loop through each document in the collect and store the buy values and
+            //? the date in a list of objects called tempList that consist of ValueDinar objects
+            for (var document in allDocuments) {
               Map<String, dynamic> prices =
                   document.data() as Map<String, dynamic>;
               tempList.add({
                 "date": document.id,
                 'price': prices['anis'][0][dropdownvalue]
               });
-              List<String> code = prices['anis'][0].keys.toList();
-
-              currencyCode.add(code);
-
-              // currencyCode.add(prices['anis'][0].keys);
             }
-            List<ValueDinar> anis =
+            List<ValueDinar> chartData =
                 tempList.map((json) => ValueDinar.fromfirebase(json)).toList();
 
             return Column(
               children: [
-                StockChartExample(data: anis),
+                DinarChart(data: chartData),
                 DropdownButton(
-                  // Initial Value
+                  // Initial allDocuments
                   value: dropdownvalue,
 
                   // Down Arrow Icon
                   icon: const Icon(Icons.keyboard_arrow_down),
 
                   // Array list of items
-                  items: itemss.map((String item) {
+                  items: currenciesCodes.map((String item) {
                     return DropdownMenuItem<String>(
                       value: item,
                       child: Row(
@@ -92,7 +89,7 @@ class _ChartState extends State<Chart> {
                     );
                   }).toList(),
                   // After selecting the desired option,it will
-                  // change button value to selected value
+                  // change button allDocuments to selected allDocuments
                   onChanged: (String? newValue) {
                     setState(() {
                       dropdownvalue = newValue!;

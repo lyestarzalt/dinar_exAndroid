@@ -4,11 +4,10 @@ import 'package:intl/intl.dart';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:dinar_ex/pages/trends/datum.dart';
-import 'data_loader.dart';
 
-class StockChartExample extends StatefulWidget {
+class DinarChart extends StatefulWidget {
   List<ValueDinar> data = [];
-  StockChartExample({
+  DinarChart({
     Key? key,
     required this.data,
   }) : super(key: key);
@@ -17,7 +16,7 @@ class StockChartExample extends StatefulWidget {
   _StockChartExampleState createState() => _StockChartExampleState();
 }
 
-class _StockChartExampleState extends State<StockChartExample> {
+class _StockChartExampleState extends State<DinarChart> {
   final List<Color> _gradientColors = [
     const Color(0xFF6FFF7C),
     const Color(0xFF0087FF),
@@ -41,7 +40,7 @@ class _StockChartExampleState extends State<StockChartExample> {
   }
 
   void _prepareStockData() async {
-    final List<ValueDinar> data = await widget.data;
+    final List<ValueDinar> data = widget.data;
 
     double minY = double.maxFinite;
     double maxY = double.minPositive;
@@ -160,7 +159,7 @@ class _StockChartExampleState extends State<StockChartExample> {
         padding:
             const EdgeInsets.only(right: 18.0, left: 12.0, top: 24, bottom: 12),
         child: _values.isEmpty
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : LineChart(_mainData()),
       ),
     );

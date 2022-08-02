@@ -24,7 +24,6 @@ class ThemeController extends GetxController {
   bool _getThemeFromHiveBox() {
     themeHiveSetting =
         settingsHiveBox.get('isDarkMode', defaultValue: Get.isDarkMode);
-    print(themeHiveSetting);
     return themeHiveSetting;
   }
 

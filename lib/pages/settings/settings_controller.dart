@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import "package:flutter/material.dart";
 import 'package:dinar_ex/theme/controller/theme_controller.dart';
 
 class SettignsController extends GetxController {
@@ -28,16 +27,11 @@ class SettignsController extends GetxController {
     );
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
 
   //
 
   @override
   void onInit() {
-    print('settings controller init');
     isDarkMode.value = _themeController.isDarkTheme;
     currentModeName.value = _themeController.isDarkTheme ? 'Dark' : 'Light';
 

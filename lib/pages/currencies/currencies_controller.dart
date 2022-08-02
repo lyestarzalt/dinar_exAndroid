@@ -11,7 +11,6 @@ class CurrenciesController extends GetxController with StateMixin {
       value.docs.forEach((element) {
         Map<String, dynamic> todayPrices = element as Map<String, dynamic>;
 
-        print(todayPrices);
       });
     });
   } */

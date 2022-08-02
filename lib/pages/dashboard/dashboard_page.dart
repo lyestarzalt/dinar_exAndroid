@@ -15,10 +15,10 @@ class DashboardPage extends StatelessWidget {
       builder: (controller) {
         return Scaffold(
           appBar: AppBar(
-            title: Text('Dashboard'),
+            title: const Text('Dashboard'),
             actions: [
               IconButton(
-                icon: Icon(Icons.settings),
+                icon: const Icon(Icons.settings),
                 onPressed: () {
                   Get.to(Settigns());
                 },
