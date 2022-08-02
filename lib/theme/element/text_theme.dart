@@ -5,10 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 class CustomTextTheme {
   //! Default Font is GoogleFonts.Ubuntu You can change it as your Need
 
-  static const _textColorLight =
-      Color(0xFF000000); // Light Theme Default Text Color
-  static const _textColorDark =
-      Color(0xFFFFFFFF); // Light Theme Default Text Color
+  static const _textColorLight = Colors.black; // Light Theme Default Text Color
+  static const _textColorDark = Colors.white; // Light Theme Default Text Color
 
   static TextTheme get textThemeLight {
     return _textTheme(textColor: _textColorLight);
@@ -22,7 +20,7 @@ class CustomTextTheme {
   static TextTheme _textTheme({required Color textColor}) {
     const FontWeight _light = FontWeight.w300;
     const FontWeight _medium = FontWeight.w500;
-    const FontWeight _regular = FontWeight.w400;
+    const FontWeight _regular = FontWeight.normal;
 
     return TextTheme(
       headline1: GoogleFonts.ubuntu(

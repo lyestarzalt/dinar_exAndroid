@@ -16,7 +16,7 @@ Future<dynamic> loadStockData() async {
     // anisoo.add(element.reference.id);
     Map<String, dynamic> prices = element.data();
     finalList
-        .add({"date": element.reference.id, 'close': prices['anis'][0]['chf']});
+        .add({"date": element.reference.id, 'price': prices['anis'][0]['chf']});
   }
 
   List anis = finalList.map((json) => ValueDinar.fromfirebase(json)).toList();

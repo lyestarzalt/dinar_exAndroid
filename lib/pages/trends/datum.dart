@@ -6,5 +6,5 @@ class ValueDinar {
 
   ValueDinar.fromfirebase(Map<String, dynamic> json)
       : date = DateTime.parse(json['date']),
-        price = json['close'].toDouble();
+        price = json['price'].toDouble();
 }

@@ -8,11 +8,11 @@ ThemeData LightThemeData() {
     brightness: Brightness
         .light, //Setting the Brightness to light  so that this can be used as Light ThemeData
     scaffoldBackgroundColor: Colors.white,
+dialogBackgroundColor:Colors.black,
     textTheme: CustomTextTheme
         .textThemeLight, //Setting the Text Theme to LightTextTheme
 
     appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.deepOrange,
       elevation: 0,
       centerTitle: true,
     ),

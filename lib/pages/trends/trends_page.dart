@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
-import 'package:dinar_ex/pages/trends/trend_controller.dart';
-
 import 'line_chart.dart';
 import 'datum.dart';
 
@@ -14,88 +12,101 @@ class Chart extends StatefulWidget {
 }
 
 class _ChartState extends State<Chart> {
-  List<String> currecies = [];
-  RxList anis = [].obs;
-  var templist = [];
   var dropdownvalue = 'gbp';
-  var anisoo = FirebaseFirestore.instance.collection('exchange-daily').get();
+  var collection =
+      FirebaseFirestore.instance.collection('exchange-daily').get();
+
   // List of items in our dropdown menu
-  var items = [
-    "chf",
-    "aed",
-    "mad",
-    "eur",
-    "gbp",
-    "sar",
-    "cad",
-    "usd",
-    "try",
-    "tnd",
-    "cny"
-  ];
-  TrendsController controller = Get.find<TrendsController>();
+  List<String> itemss = [];
+  var _collection;
+  @override
+  void initState() {
+    _collection = collection;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(children: [
       //Initialize the chart widget
       FutureBuilder<QuerySnapshot>(
-        future: anisoo,
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        future: _collection,
+        builder: (BuildContext context, snapshot) {
+          print('trend page rebuild');
+
           if (snapshot.connectionState != ConnectionState.done) {
-            return Center(child: CircularProgressIndicator());
-            ;
-          }
-
-          if (snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasData) {
             List<QueryDocumentSnapshot<Object?>> value = snapshot.data!.docs;
+            print('trends list rebuild2');
 
-            final List<dynamic> finalList = [];
-
+            final List<dynamic> tempList = [];
+            final List<List<String>> currencyCode = [];
+            Map<dynamic, dynamic> test =
+                value.last.data() as Map<dynamic, dynamic>;
+            Map<String, dynamic> lol = test['anis'][0];
+            itemss = lol.keys.toList();
+            print(itemss);
             for (var document in value) {
               Map<String, dynamic> prices =
                   document.data() as Map<String, dynamic>;
-              finalList.add({
+              tempList.add({
                 "date": document.id,
-                'close': prices['anis'][0][dropdownvalue]
+                'price': prices['anis'][0][dropdownvalue]
               });
+              List<String> code = prices['anis'][0].keys.toList();
+
+              currencyCode.add(code);
+
+              // currencyCode.add(prices['anis'][0].keys);
             }
             List<ValueDinar> anis =
-                finalList.map((json) => ValueDinar.fromfirebase(json)).toList();
+                tempList.map((json) => ValueDinar.fromfirebase(json)).toList();
 
-            print(anis.first.price);
-            return StockChartExample(data: anis);
+            return Column(
+              children: [
+                StockChartExample(data: anis),
+                DropdownButton(
+                  // Initial Value
+                  value: dropdownvalue,
+
+                  // Down Arrow Icon
+                  icon: const Icon(Icons.keyboard_arrow_down),
+
+                  // Array list of items
+                  items: itemss.map((String item) {
+                    return DropdownMenuItem<String>(
+                      value: item,
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: Image.asset(
+                              'icons/currency/$item.png',
+                              package: 'currency_icons',
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  // After selecting the desired option,it will
+                  // change button value to selected value
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      dropdownvalue = newValue!;
+                      _collection = FirebaseFirestore.instance
+                          .collection('exchange-daily')
+                          .get();
+                    });
+                  },
+                ),
+              ],
+            );
           } else {
             return const Center(child: CircularProgressIndicator());
           }
-        },
-      ),
-      ElevatedButton(
-        onPressed: () => controller.changeAppTheme(),
-        child: Text('chage'),
-      ),
-      DropdownButton(
-        // Initial Value
-        value: dropdownvalue,
-
-        // Down Arrow Icon
-        icon: const Icon(Icons.keyboard_arrow_down),
-
-        // Array list of items
-        items: items.map((String items) {
-          return DropdownMenuItem(
-            value: items,
-            child: Text(items),
-          );
-        }).toList(),
-        // After selecting the desired option,it will
-        // change button value to selected value
-        onChanged: (String? newValue) {
-          setState(() {
-            dropdownvalue = newValue!;
-            anisoo =
-                FirebaseFirestore.instance.collection('exchange-daily').get();
-            printError();
-          });
         },
       ),
     ]);

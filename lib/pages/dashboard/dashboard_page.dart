@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:dinar_ex/pages/currencies/currencies_list.dart';
 import 'package:dinar_ex/pages/trends/trends_page.dart';
+import 'package:dinar_ex/pages/settings/settings_page.dart';
 
 import 'dashboard_controller.dart';
 
@@ -14,20 +14,26 @@ class DashboardPage extends StatelessWidget {
     return GetBuilder<DashboardController>(
       builder: (controller) {
         return Scaffold(
+          appBar: AppBar(
+            title: Text('Dashboard'),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.settings),
+                onPressed: () {
+                  Get.to(Settigns());
+                },
+              ),
+            ],
+          ),
           body: SafeArea(
             child: IndexedStack(
-              index: controller.tabIndex,
-              children: [
-                CurrenciesList(),
-                Chart(),
-              ],
+              index: controller.tabIndex.value,
+              children: [CurrenciesList(), const Chart(), Settigns()],
             ),
           ),
           bottomNavigationBar: BottomNavigationBar(
-            unselectedItemColor: Colors.black,
-            selectedItemColor: Colors.redAccent,
             onTap: controller.changeTabIndex,
-            currentIndex: controller.tabIndex,
+            currentIndex: controller.tabIndex.value,
             showSelectedLabels: false,
             showUnselectedLabels: false,
             type: BottomNavigationBarType.fixed,
@@ -40,6 +46,10 @@ class DashboardPage extends StatelessWidget {
               _bottomNavigationBarItem(
                 icon: CupertinoIcons.chart_bar,
                 label: 'News',
+              ),
+              _bottomNavigationBarItem(
+                icon: CupertinoIcons.settings,
+                label: 'Settings',
               ),
             ],
           ),

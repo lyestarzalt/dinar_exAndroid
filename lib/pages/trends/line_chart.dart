@@ -105,6 +105,10 @@ class _StockChartExampleState extends State<StockChartExample> {
 
   SideTitles _leftTitles() {
     return SideTitles(
+      getTextStyles: (value) => TextStyle(
+        fontSize: 12,
+        color: Theme.of(context).dialogBackgroundColor,
+      ),
       showTitles: true,
       getTitles: (value) =>
           NumberFormat.compactCurrency(symbol: '').format(value),
@@ -116,6 +120,10 @@ class _StockChartExampleState extends State<StockChartExample> {
 
   SideTitles _bottomTitles() {
     return SideTitles(
+      getTextStyles: (value) => TextStyle(
+        color: Theme.of(context).dialogBackgroundColor,
+        fontSize: 12,
+      ),
       showTitles: true,
       getTitles: (value) {
         final DateTime date =

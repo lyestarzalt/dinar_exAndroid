@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 import 'currencies_controller.dart';
 
-// ignore: must_be_immutable
 class Convert extends StatefulWidget {
   double buyPrice = 0.0;
   double sellPrice = 0.0;
@@ -24,6 +23,8 @@ class Convert extends StatefulWidget {
 class _ConvertState extends State<Convert> with TickerProviderStateMixin {
   final double widgetATop = 25;
   final double widgetBTop = 115;
+  bool swapped = false;
+  RxBool todinar = true.obs;
 
   late AnimationController animateController;
   late Animation<double> addressAnimation;
@@ -57,7 +58,8 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
   }
 
   //
-  CurrenciesController controller = Get.put(CurrenciesController());
+  CurrenciesController controller =
+      Get.put(CurrenciesController(), permanent: true);
 
   NumberFormat f = NumberFormat("#,###,###.########", "en_US");
 
@@ -73,6 +75,7 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    print('convert build');
     double tweenValue = addressAnimation.value;
 
     return Stack(children: [
@@ -84,7 +87,6 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
               color: Colors.blueGrey, //<-- SEE HERE
             ),
           ),
-          color: Colors.white,
           elevation: 50,
           child: SizedBox(
             height: 50,
@@ -121,7 +123,7 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
                     ),
                   ),
                   Flexible(
-                    child: controller.todinar.value
+                    child: todinar.value
                         ? TextFormField(
                             inputFormatters: [
                                 FilteringTextInputFormatter.allow(
@@ -138,8 +140,8 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
                                 TextStyle(fontSize: 20.0, color: Colors.black))
                         : Obx(
                             () => SelectableText(
-                                convertedValue(controller.todinar.value,
-                                    widget.sellPrice, widget.buyPrice),
+                                convertedValue(todinar.value, widget.sellPrice,
+                                    widget.buyPrice),
                                 style: TextStyle(
                                     fontSize: 20.0, color: Colors.black)),
                           ),
@@ -159,19 +161,18 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
                   //from stackoverflow
                   //That is value xor-equals true, which will flip it every time,
                   //and without any branching or temporary variables.
+                  todinar.value ^= true;
 
                   //or this
                   setState(() {
-                    controller.flip();
-                    controller.todinar.value
+                    swapped
                         ? animateController.reverse()
                         : animateController.forward();
+                    swapped = !swapped;
                   });
                 },
                 child: const CircleAvatar(
-                    radius: 15,
-                    backgroundColor: Colors.indigo,
-                    child: Icon(Icons.compare_arrows_outlined))),
+                    radius: 15, child: Icon(Icons.compare_arrows_outlined))),
           ],
         ),
       ),
@@ -217,12 +218,12 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
                       ]),
                     ),
                   ),
-                  controller.todinar.isTrue
+                  todinar.isTrue
                       ? Flexible(
                           child: Obx(
                             () => SelectableText(
-                                convertedValue(controller.todinar.value,
-                                    widget.sellPrice, widget.buyPrice),
+                                convertedValue(todinar.value, widget.sellPrice,
+                                    widget.buyPrice),
                                 style: TextStyle(
                                     fontSize: 20.0, color: Colors.black)),
                           ),
@@ -259,7 +260,7 @@ class _ConvertState extends State<Convert> with TickerProviderStateMixin {
               transitionBuilder: (Widget child, Animation<double> animation) {
                 return ScaleTransition(child: child, scale: animation);
               },
-              child: controller.todinar.isTrue
+              child: todinar.isTrue
                   ? Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(

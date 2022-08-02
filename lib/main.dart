@@ -25,8 +25,7 @@ void main() async {
   );
 
   try {
-    final userCredential = await FirebaseAuth.instance.signInAnonymously();
-    print("Signed in with temporary account.");
+    await FirebaseAuth.instance.signInAnonymously();
   } on FirebaseAuthException catch (e) {
     switch (e.code) {
       case "operation-not-allowed":
@@ -43,13 +42,12 @@ void main() async {
 }
 
 class MyHomePage extends StatelessWidget {
-  final ThemeController _themeController = Get.put(ThemeController());
+  final ThemeController _themeController =
+      Get.put(ThemeController(), permanent: true);
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      initialBinding: DashboardBinding(),
-
       initialRoute: AppRoutes.DASHBOARD,
       getPages: AppPages.list,
       debugShowCheckedModeBanner: false,
