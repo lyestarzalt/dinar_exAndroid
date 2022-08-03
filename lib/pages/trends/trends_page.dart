@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'line_chart.dart';
 import 'datum.dart';
+import 'package:dinar_ex/pages/currencies/currencies_model.dart';
 
 class Chart extends StatefulWidget {
   const Chart({Key? key}) : super(key: key);
@@ -13,9 +14,8 @@ class Chart extends StatefulWidget {
 class _ChartState extends State<Chart> {
   var dropdownvalue = 'gbp';
   var collection =
-      FirebaseFirestore.instance.collection('exchange-daily').get();
+      FirebaseFirestore.instance.collection('exchange-daily').snapshots();
 
-  // List of items in our dropdown menu
   List<String> currenciesCodes = [];
   var _collection;
   @override
@@ -34,22 +34,16 @@ class _ChartState extends State<Chart> {
           if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasData) {
-            List<QueryDocumentSnapshot<Object?>> allDocuments =
-                snapshot.data!.docs;
-
+            var dinar = CurrenciesModel.fromDocumentSnapshot(snapshot);
+            var all = dinar.alldoc;
             final List<dynamic> tempList = [];
 
-            //? get last day and store every key to the curreincesCodes list
-            //? to be used in the dropdown menu
-            Map<dynamic, dynamic> lastDay =
-                allDocuments.last.data() as Map<dynamic, dynamic>;
-
-            Map<String, dynamic> curenciesMap = lastDay['anis'][0];
-            currenciesCodes = curenciesMap.keys.toList();
+            currenciesCodes = dinar.currenciesCodes;
 
             //? loop through each document in the collect and store the buy values and
             //? the date in a list of objects called tempList that consist of ValueDinar objects
-            for (var document in allDocuments) {
+
+            for (var document in all) {
               Map<String, dynamic> prices =
                   document.data() as Map<String, dynamic>;
               tempList.add({

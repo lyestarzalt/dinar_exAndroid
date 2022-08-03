@@ -1,3 +1,5 @@
+
+//not ideal but better than fetching the country name outside of the app.
 Map codeToCountry = {
   "AED": "United Arab Emirates",
   "AFN": "Afghanistan",
